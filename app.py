@@ -1,5 +1,6 @@
 import os
 import random
+import string
 import pandas as pd
 import json
 from datetime import datetime
@@ -38,6 +39,11 @@ def load_user(user_id):
 
 def generate_random_profile_pic():
     return f"https://avatars.dicebear.com/api/avataaars/{random.randint(1, 1000)}.svg"
+
+def generate_random_password():
+    characters = string.ascii_letters + string.digits
+    password = ''.join(random.choice(characters) for i in range(8))
+    return password
 
 @server.route('/')
 def index():
@@ -98,28 +104,23 @@ class DataVisualizerDash:
 
         self.app = dash.Dash(__name__, server=flask_app, url_base_pathname='/dash/', external_stylesheets=[dbc.themes.BOOTSTRAP])
         self.build_layout()
+        self.register_callbacks()
 
     def build_layout(self):
         self.app.layout = dbc.Container([
             dbc.Row([
-                dbc.Col(html.H1("Data Visualizer", style={
+                dbc.Col(html.H1("Data Visualizer Studio v-1.0", style={
                     'text-align': 'center',
                     'font-weight': 'bold',
                     'text-transform': 'uppercase',
-                    'background-color': 'black',
-                    'color': 'white',
+                    'background-color': 'white',
+                    'color': 'black',
                     'padding': '10px'
                 }), width=12)
             ]),
             dbc.Row([
                 dbc.Col([
-                    html.Div([
-                        html.Img(id='profile-pic', src=current_user.profile_pic if current_user.is_authenticated else "https://via.placeholder.com/150", style={'border-radius': '50%', 'width': '100px', 'margin': 'auto'}),
-                        html.H2(id='user-name', children=current_user.username if current_user.is_authenticated else "User", style={'text-align': 'center'}),
-                        html.P(id='login-status', children="Logged In" if current_user.is_authenticated else "Logged Out", style={'text-align': 'center'}),
-                        dbc.Button('Logout', id='logout-btn', color='black', className="mb-2", style={'display': 'block', 'margin': '10px auto', 'background-color': 'black', 'color': 'white'})
-                    ], style={'text-align': 'center', 'padding': '20px'}),
-                    html.H3("Side Panel"),
+                    html.Div(id='user-info'),
                     dcc.Upload(
                         id='upload-data',
                         children=html.Div(['Drag and Drop or ', html.A('Select Files')]),
@@ -132,7 +133,7 @@ class DataVisualizerDash:
                             'borderRadius': '5px',
                             'textAlign': 'center',
                             'margin': '10px',
-                            'background-color': '#f9f9f9',
+                            'background-color': '#fff',
                         },
                         multiple=False
                     ),
@@ -141,31 +142,24 @@ class DataVisualizerDash:
                     html.Div(id='dataset-list'),
                     html.H3("Create Visualization"),
                     dbc.Input(id='dataset-id', placeholder='Enter Dataset ID', type='number', className="mb-2"),
-                    dbc.Input(id='viz-type', placeholder='Enter visualization type (bar/line)', type='text', className="mb-2"),
                     dbc.Input(id='x-col', placeholder='Enter X-axis column', type='text', className="mb-2"),
                     dbc.Input(id='y-col', placeholder='Enter Y-axis column', type='text', className="mb-2"),
                     dbc.Input(id='x-label', placeholder='Enter X-axis label', type='text', className="mb-2"),
                     dbc.Input(id='y-label', placeholder='Enter Y-axis label', type='text', className="mb-2"),
-                    dbc.Button('Create Visualization', id='create-viz-btn', n_clicks=0, color="primary"),
+                    dbc.Button('Create Line Graph', id='create-line-graph-btn', n_clicks=0, color="primary"),
+                    dbc.Button('Create Bar Graph', id='create-bar-graph-btn', n_clicks=0, color="primary"),
                     html.Div(id='visualization-output'),
                     html.H3("Save Visualization"),
                     dbc.Input(id='viz-id', placeholder='Enter Visualization ID', type='number', className="mb-2"),
                     dbc.Button('Save Visualization', id='save-viz-btn', n_clicks=0, color="primary"),
                     html.Div(id='save-viz-output'),
-                    html.H3("Document Name"),
-                    dbc.Input(id='document-name', placeholder='Enter Document Name', type='text', className="mb-2"),
-                    html.H3("Manage Documents"),
-                    dbc.Button('Add Document', id='add-document-btn', n_clicks=0, color="success", className="mb-2"),
-                    dbc.Button('Switch Document', id='switch-document-btn', n_clicks=0, color="info", className="mb-2"),
-                    html.Div(id='document-list'),
                 ], width=3, style={
                     'background-color': '#e3f2fd',
                     'padding': '20px',
                     'border-radius': '5px'
                 }),
                 dbc.Col([
-                    html.H3("Main Panel"),
-                    html.Div(id='document-title', style={'text-align': 'center', 'font-weight': 'bold', 'margin-bottom': '20px'}),
+                    html.H3("Dashboard"),
                     dash_table.DataTable(
                         id='table-editing-simple',
                         columns=[{"name": i, "id": i} for i in ['Year', 'Sales', 'Profit']],
@@ -190,10 +184,22 @@ class DataVisualizerDash:
                             }
                         ]
                     ),
-                    dcc.Graph(id='main-graph'),
+                    dbc.Button('Update Graphs', id='update-graphs-btn', n_clicks=0, color="primary"),
+                    dcc.Graph(id='line-graph'),
+                    dcc.Graph(id='bar-graph'),
                 ], width=9)
             ]),
         ], fluid=True)
+
+    def register_callbacks(self):
+        @self.app.callback(
+            Output('user-info', 'children'),
+            [Input('upload-data', 'contents')]
+        )
+        def update_user_info(contents):
+            if current_user.is_authenticated:
+                return html.H3(f"Welcome, {current_user.username}")
+            return html.H3("Welcome, User")
 
         self.app.callback(
             Output('output-data-upload', 'children'),
@@ -208,15 +214,25 @@ class DataVisualizerDash:
 
         self.app.callback(
             Output('visualization-output', 'children'),
-            Output('main-graph', 'figure'),
-            Input('create-viz-btn', 'n_clicks'),
+            Output('line-graph', 'figure'),
+            Input('create-line-graph-btn', 'n_clicks'),
             State('dataset-id', 'value'),
-            State('viz-type', 'value'),
             State('x-col', 'value'),
             State('y-col', 'value'),
             State('x-label', 'value'),
             State('y-label', 'value')
-        )(self.create_visualization)
+        )(self.create_line_graph)
+
+        self.app.callback(
+            Output('visualization-output', 'children'),
+            Output('bar-graph', 'figure'),
+            Input('create-bar-graph-btn', 'n_clicks'),
+            State('dataset-id', 'value'),
+            State('x-col', 'value'),
+            State('y-col', 'value'),
+            State('x-label', 'value'),
+            State('y-label', 'value')
+        )(self.create_bar_graph)
 
         self.app.callback(
             Output('save-viz-output', 'children'),
@@ -225,19 +241,13 @@ class DataVisualizerDash:
         )(self.save_visualization)
 
         self.app.callback(
-            Output('document-list', 'children'),
-            Output('document-title', 'children'),
-            Input('add-document-btn', 'n_clicks'),
-            State('document-name', 'value'),
-            State('table-editing-simple', 'data')
-        )(self.add_document)
-
-        self.app.callback(
-            Output('table-editing-simple', 'data'),
-            Output('document-title', 'children'),
-            Input('switch-document-btn', 'n_clicks'),
-            State('document-name', 'value')
-        )(self.switch_document)
+            Output('line-graph', 'figure'),
+            Output('bar-graph', 'figure'),
+            Input('update-graphs-btn', 'n_clicks'),
+            State('table-editing-simple', 'data'),
+            State('x-label', 'value'),
+            State('y-label', 'value')
+        )(self.update_graphs)
 
     def upload_csv(self, contents, filename):
         if contents is None:
@@ -266,7 +276,7 @@ class DataVisualizerDash:
         datasets_info = [html.P(f"ID: {dataset_id}, Name: {info['name']}, Uploaded At: {info['uploaded_at']}") for dataset_id, info in self.datasets.items()]
         return html.Div(datasets_info)
 
-    def create_visualization(self, n_clicks, dataset_id, viz_type, x_col, y_col, x_label, y_label):
+    def create_line_graph(self, n_clicks, dataset_id, x_col, y_col, x_label, y_label):
         if n_clicks == 0:
             return html.Div(), {}
 
@@ -279,24 +289,42 @@ class DataVisualizerDash:
         if x_col not in df.columns or y_col not in df.columns:
             return html.Div([html.H5(f"Invalid columns: {x_col}, {y_col}")]), {}
 
-        fig = None
-        if viz_type == "bar":
-            fig = px.bar(df, x=x_col, y=y_col, labels={x_col: x_label, y_col: y_label})
-        elif viz_type == "line":
-            fig = px.line(df, x=x_col, y=y_col, labels={x_col: x_label, y_col: y_label})
-        else:
-            return html.Div([html.H5(f"Unsupported visualization type: {viz_type}")]), {}
-
+        fig = px.line(df, x=x_col, y=y_col, labels={x_col: x_label, y_col: y_label})
         viz_id = len(self.visualizations) + 1
         self.visualizations[viz_id] = {
             "dataset_id": dataset_id,
-            "type": viz_type,
+            "type": "line",
             "x_col": x_col,
             "y_col": y_col,
             "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
 
-        return html.Div([html.H5(f"Visualization {viz_type} created successfully with ID {viz_id}.")]), fig
+        return html.Div([html.H5(f"Line graph created successfully with ID {viz_id}.")]), fig
+
+    def create_bar_graph(self, n_clicks, dataset_id, x_col, y_col, x_label, y_label):
+        if n_clicks == 0:
+            return html.Div(), {}
+
+        if dataset_id not in self.datasets:
+            return html.Div([html.H5(f"Dataset with ID {dataset_id} does not exist.")]), {}
+
+        dataset = self.datasets[dataset_id]
+        df = dataset["data"]
+
+        if x_col not in df.columns or y_col not in df.columns:
+            return html.Div([html.H5(f"Invalid columns: {x_col}, {y_col}")]), {}
+
+        fig = px.bar(df, x=x_col, y=y_col, labels={x_col: x_label, y_col: y_label})
+        viz_id = len(self.visualizations) + 1
+        self.visualizations[viz_id] = {
+            "dataset_id": dataset_id,
+            "type": "bar",
+            "x_col": x_col,
+            "y_col": y_col,
+            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+
+        return html.Div([html.H5(f"Bar graph created successfully with ID {viz_id}.")]), fig
 
     def save_visualization(self, n_clicks, viz_id):
         if n_clicks == 0:
@@ -313,36 +341,21 @@ class DataVisualizerDash:
 
         return html.Div([html.H5(f"Visualization {viz_id} saved successfully at {viz_file_path}.")])
 
-    def add_document(self, n_clicks, document_name, table_data):
-        if n_clicks == 0 or not document_name:
-            return [], "No document selected"
+    def update_graphs(self, n_clicks, table_data, x_label, y_label):
+        if n_clicks == 0:
+            return {}, {}
 
-        document_id = len(self.datasets) + 1
         df = pd.DataFrame(table_data)
-        self.datasets[document_id] = {
-            "name": document_name,
-            "data": df,
-            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        }
-        documents = [html.P(f"ID: {document_id}, Name: {document_name}, Created At: {self.datasets[document_id]['created_at']}")]
-        return documents, f"Current Document: {document_name}"
+        line_fig = px.line(df, x=df.columns[0], y=df.columns[1], labels={df.columns[0]: x_label, df.columns[1]: y_label})
+        bar_fig = px.bar(df, x=df.columns[0], y=df.columns[1], labels={df.columns[0]: x_label, df.columns[1]: y_label})
 
-    def switch_document(self, n_clicks, document_name):
-        if n_clicks == 0 or not document_name:
-            return [], "No document selected"
-
-        for document_id, info in self.datasets.items():
-            if info["name"] == document_name:
-                data = info["data"].to_dict("records")
-                return data, f"Current Document: {document_name}"
-
-        return [], "Document not found"
+        return line_fig, bar_fig
 
     def run(self):
         self.app.run_server(debug=True)
 
 if __name__ == "__main__":
-    app = DataVisualizerDash()
+    app = DataVisualizerDash(server)
     with server.app_context():
         db.create_all()
     app.run()
