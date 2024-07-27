@@ -105,32 +105,6 @@ Ensure you have the following software installed:
 - Visualizations are stored with their configurations, allowing you to reload and share them easily.
 
 
-## Project Structure
-
-```
-DataVizShowcase/
-├── backend/
-│   ├── app.py
-│   ├── models.py
-│   ├── views.py
-│   ├── requirements.txt
-│   └── config.py
-├── frontend/
-│   ├── public/
-│   │   ├── index.html
-│   └── src/
-│       ├── App.js
-│       ├── index.js
-│       ├── components/
-│       │   ├── DatasetUpload.js
-│       │   ├── DatasetList.js
-│       │   ├── Visualization.js
-│       └── styles/
-│           ├── App.css
-│           └── Visualization.css
-└── README.md
-```
-
 ## Contributing
 
 Contributions are welcome! Please fork this repository and submit pull requests for any features, improvements, or bug fixes.
