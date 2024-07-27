@@ -104,15 +104,6 @@ Ensure you have the following software installed:
 - After creating a visualization, you can save it for future reference.
 - Visualizations are stored with their configurations, allowing you to reload and share them easily.
 
-## Example Visualizations
-
-### Bar Chart
-
-![Bar Chart Example](https://via.placeholder.com/600x400.png?text=Bar+Chart+Example)
-
-### Line Chart
-
-![Line Chart Example](https://via.placeholder.com/600x400.png?text=Line+Chart+Example)
 
 ## Project Structure
 
