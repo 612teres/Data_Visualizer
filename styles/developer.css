@@ -1,8 +1,17 @@
 aside {
     width: 60%;
     padding-left: 15px;
-    margin-right: 50px;
+    margin-right: 100px;
     float: right;
     font-style: italic;
     font-size: 18px;
+}
+
+.fa {
+    padding: 20px;
+    font-size: 60px;
+    width: 50px;
+    height: 100px;
+    text-align: center;
+    text-decoration: none;
 }
