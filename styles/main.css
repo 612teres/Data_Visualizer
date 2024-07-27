@@ -4,6 +4,10 @@
     scroll-behavior: smooth;
 }
 
+[class*="div-"] {
+    width: 100%;
+}
+
 main {
     align-items: center;
     justify-content: center;
@@ -100,6 +104,11 @@ nav a:hover::after {
     border-radius: 30px;
     padding: 18px 47px;
     background: linear-gradient(90deg, #59d8ff 15.1%, #094466 85.42%);
+}
+
+a{
+    color: white;
+    text-decoration: none;
 }
 
 .about {
