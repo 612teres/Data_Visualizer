@@ -25,18 +25,18 @@ class DataVisualizerDash:
     def build_layout(self):
         self.app.layout = dbc.Container([
             dbc.Row([
-                dbc.Col(html.H1("Data Visualizer", style={
+                dbc.Col(html.H1("Data Visualizer Studio V-1.0", style={
                     'text-align': 'center',
                     'font-weight': 'bold',
                     'text-transform': 'uppercase',
-                    'background-color': 'black',
-                    'color': 'white',
+                    'background-color': 'white',
+                    'color': 'black',
                     'padding': '10px'
                 }), width=12)
             ]),
             dbc.Row([
                 dbc.Col([
-                    html.H3("Side Panel"),
+                    html.H3("Dashboard"),
                     dcc.Upload(
                         id='upload-data',
                         children=html.Div(['Drag and Drop or ', html.A('Select Files')]),
@@ -45,7 +45,7 @@ class DataVisualizerDash:
                             'height': '60px',
                             'lineHeight': '60px',
                             'borderWidth': '1px',
-                            'borderStyle': 'dashed',
+                            'borderStyle': 'none',
                             'borderRadius': '5px',
                             'textAlign': 'center',
                             'margin': '10px',
@@ -75,16 +75,15 @@ class DataVisualizerDash:
                     'border-radius': '5px'
                 }),
                 dbc.Col([
-                    html.H3("Main Panel"),
                     dash_table.DataTable(
                         id='table-editing-simple',
                         columns=[{"name": i, "id": i} for i in ['Year', 'Sales', 'Profit']],
                         data=[{'Year': 2016, 'Sales': 150, 'Profit': 30},
-                              {'Year': 2017, 'Sales': 200, 'Profit': 50},
-                              {'Year': 2018, 'Sales': 250, 'Profit': 60},
-                              {'Year': 2019, 'Sales': 300, 'Profit': 70},
-                              {'Year': 2020, 'Sales': 350, 'Profit': 80},
-                              {'Year': 2021, 'Sales': 400, 'Profit': 90}],
+                            {'Year': 2017, 'Sales': 200, 'Profit': 50},
+                            {'Year': 2018, 'Sales': 250, 'Profit': 60},
+                            {'Year': 2019, 'Sales': 300, 'Profit': 70},
+                            {'Year': 2020, 'Sales': 350, 'Profit': 80},
+                            {'Year': 2021, 'Sales': 400, 'Profit': 90}],
                         editable=True,
                         row_deletable=True,
                         style_table={'height': '300px', 'overflowY': 'auto'},
