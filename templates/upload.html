@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload File</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <h2>DATA VISUALIZER STUDIO</h2>
+            </div>
+            <div class="nav-items">
+                <ul>
+                    <li><a href="/blog">Blog</a></li>
+                    <li><a href="/contact">Contact Us</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-text">
+            <h1>VISUALIZE YOUR DATA</h1>
+            <br>
+        <p>Upload your file to get started</p>
+        <form method="POST" enctype="multipart/form-data">
+            <br>
+            <br>
+            <input type="file" name="file">
+            <button class="btn" type="submit" value="Upload">Upload</button>
+        </form>
+        </div>
+    </section>
+</body>
+</html>

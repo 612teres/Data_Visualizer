@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Blog</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <h2>DATA VISUALIZER</h2>
+            </div>
+            <div class="nav-items">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/contact">Contact Us</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <h1>Developer Blog</h1>
+    <div class="row">
+        <div class="leftcolumn">
+        <div class="card">
+            {% for post in posts %}
+            <h2>{{ post.title }}</h2>
+            <div class="fakeimg" style="height:200px;">
+                <img src="{{ post.image }}" alt="Image">
+            </div>
+            <p>{{ post.content }}</p>
+        {% endfor %}
+        </div>
+        </div>
+        <div class="rightcolumn">
+        <div class="card">
+            <h2>About Me</h2>
+            <div class="fakeimg" style="height:100px;">
+                <img src="/static/fabian.jpg" alt="">
+            </div>
+            <p>As a dedicated and innovative software developer affiliated with ALX Africa, I, 
+                Fabian Teres, have a proven track record in designing, developing, and deploying 
+                robust applications. My expertise lies in crafting high-quality, scalable software 
+                solutions that meet diverse client needs.</p>
+        </div>
+        <div class="card">
+            <h3>Contact Me:</h3>
+            <a href="https://x.com/Phantom6129114" class="fa fa-twitter"></a>
+            <a href="https://web.facebook.com/fabian.teres" class="fa fa-facebook"></a>
+            <a href="www.linkedin.com/in/fabian-teres-282783239" class="fa fa-linkedin"></a>
+            <p>612teres@gmail.com</p>
+            <p>Phone: +254113061291</p>
+        </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Copyright &copy;<a href="#">TOFIT SOLUTIONS</a> 2024</p>
+    </div>
+</body>
+</html>
